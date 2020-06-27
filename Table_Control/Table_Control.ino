@@ -22,6 +22,7 @@ void loop()
   {
     gameStatus = true;
     gameTime = 180;
+    command = none;
   }
   
   if(gameStatus)
