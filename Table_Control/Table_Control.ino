@@ -1,3 +1,8 @@
+#define REFRESH_INTERVAL 750
+
+int dispMillis;
+int prevDispMillis = 0;
+
 String command;
 
 int matchTime;
@@ -5,30 +10,14 @@ int matchMin;
 int matchSec;
 bool matchStatus;
 
-int currentMillis;
-int prevMillis = 0;
+int diffMillis;
+int matchMillis;
+int prevMatchMillis = 0;
 
 void setup() 
 {
   Serial.begin(9600);
   matchStatus = false;
-}
-
-void loop() 
-{
-  commadHandler();
-
-  if(command == (matchStart))
-  {
-    matchStatus = true;
-    matchTime = 180;
-    command = none;
-  }
-  
-  if(matchStatus)
-  {
-    matchTimer();
-  }
 }
 
 void commandHandler()
@@ -39,31 +28,77 @@ void commandHandler()
     Serial.print("Recieved Command: ");
     Serial.println(command);
   }
+
+  if(command == ("start match"))
+  {
+    matchStatus = true;
+    matchTime = 180;
+    command = "none";
+  }
+
+  if(command == ("pause"))
+  {
+    matchStatus = false;
+  }
+
+  if(command == ("resume"))
+  {
+    matchStatus = true;
+  }
 }
 
 void matchTimer()
 {
-  currentMillis = millis();
+  matchMillis = millis();
 
-  if((currentMillis - prevMillis) >= 1000)
+  if((matchMillis - prevMatchMillis) > diffMillis)
+  {
+    prevMatchMillis = matchMillis - diffMillis;
+  }
+
+  diffMillis = matchMillis - prevMatchMillis;
+
+  if((matchMillis - prevMatchMillis) >= 1000)
   {
     matchTime--;
-    prevMillis = currentMillis;
+    prevMatchMillis = matchMillis;
   }
-
-  matchMin = matchTime / 60;
-  matchSec = matchTime % 60;
-
-  Serial.print(gameMin);
-  Serial.print(":");
-  if(matchSec < 10)
-  {
-    Serial.print("0");
-  }
-  Serial.println(matchSec);
 
   if(matchTime = 0)
   {
     matchStatus = false;
   }
+}
+
+void timeDisplay()
+{
+  dispMillis = millis();
+  
+  if((dispMillis - prevDispMillis) == REFRESH_INTERVAL)
+  {
+    prevDispMillis = dispMillis;
+    
+    matchMin = matchTime / 60;
+    matchSec = matchTime % 60;
+
+    Serial.print(matchMin);
+    Serial.print(":");
+    if(matchSec < 10)
+    {
+      Serial.print("0");
+    }
+    Serial.println(matchSec);
+  }
+}
+
+void loop() 
+{
+  commandHandler();
+  
+  if(matchStatus)
+  {
+    matchTimer();
+  }
+
+  timeDisplay();
 }
