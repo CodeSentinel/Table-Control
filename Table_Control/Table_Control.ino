@@ -1,9 +1,9 @@
 String command;
 
-int gameTime;
-int gameMin;
-int gameSec;
-bool gameStatus;
+int matchTime;
+int matchMin;
+int matchSec;
+bool matchStatus;
 
 int currentMillis;
 int prevMillis = 0;
@@ -11,23 +11,23 @@ int prevMillis = 0;
 void setup() 
 {
   Serial.begin(9600);
-  gameStatus = false;
+  matchStatus = false;
 }
 
 void loop() 
 {
   commadHandler();
 
-  if(command == (gameStart))
+  if(command == (matchStart))
   {
-    gameStatus = true;
-    gameTime = 180;
+    matchStatus = true;
+    matchTime = 180;
     command = none;
   }
   
-  if(gameStatus)
+  if(matchStatus)
   {
-    gameTimer();
+    matchTimer();
   }
 }
 
@@ -41,29 +41,29 @@ void commandHandler()
   }
 }
 
-void gameTimer()
+void matchTimer()
 {
   currentMillis = millis();
 
   if((currentMillis - prevMillis) >= 1000)
   {
-    gameTime--;
+    matchTime--;
     prevMillis = currentMillis;
   }
 
-  gameMin = gameTime / 60;
-  gameSec = gameTime % 60;
+  matchMin = matchTime / 60;
+  matchSec = matchTime % 60;
 
   Serial.print(gameMin);
   Serial.print(":");
-  if(gameSec < 10)
+  if(matchSec < 10)
   {
     Serial.print("0");
   }
-  Serial.println(gameSec);
+  Serial.println(matchSec);
 
-  if(gameTime = 0)
+  if(matchTime = 0)
   {
-    gameStatus = false;
+    matchStatus = false;
   }
 }
