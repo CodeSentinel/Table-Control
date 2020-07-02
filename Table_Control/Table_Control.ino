@@ -39,11 +39,13 @@ void commandHandler()         // function to handle serial command (mainly used 
   if(command == ("pause"))
   {
     matchStatus = false;
+    command = "none";
   }
 
   if(command == ("resume"))
   {
     matchStatus = true;
+    command = "none";
   }
 }
 
