@@ -1,4 +1,4 @@
-#define REFRESH_INTERVAL 750          // display refresh interval
+#define REFRESH_INTERVAL 500          // display refresh interval
 
 int dispMillis;         // millis variables for display refresh
 int prevDispMillis = 0;
@@ -77,7 +77,7 @@ void timeDisplay()          // function to handle the display of the match timer
 {
   dispMillis = millis();
   
-  if((dispMillis - prevDispMillis) == REFRESH_INTERVAL)         // checks to see if the display needs to be refreshed
+  if((dispMillis - prevDispMillis) >= REFRESH_INTERVAL)         // checks to see if the display needs to be refreshed
   {
     prevDispMillis = dispMillis;
     
@@ -104,10 +104,4 @@ void loop()         // main loop for calling other functions
   }
 
   timeDisplay();
-
-  //Serial.println(matchStatus);          // serial debugging markers
-  //Serial.println(matchTime);
-  //Serial.println(millis());
-  //Serial.println(matchMillis);
-  //Serial.println(prevMatchMillis);
 }
