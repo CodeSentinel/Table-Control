@@ -8,28 +8,28 @@ String command;
 int matchTime;          // match status variables
 int matchMin;
 int matchSec;
-bool matchStatus;
+bool matchStatus = false;
 
-int diffMillis;         // match timekeeping millis
+int diffMillis  = 100;         // match timekeeping variables
 int matchMillis;
 int prevMatchMillis = 0;
 
 void setup() 
 {
   Serial.begin(9600);
-  matchStatus = false;
+  Serial.println("System Start");
 }
 
 void commandHandler()         // function to handle serial command (mainly used for serial line commands during prototyping)
 {
-  if(Serial.available() > 0)          // checks for a command in the serial port and writes it to a string if available
+  if(Serial.available())          // checks for a command in the serial port and writes it to a string if available
   {
-    command = Serial.read();
+    command = Serial.readString();
     Serial.print("Recieved Command: ");
     Serial.println(command);
   }
 
-  if(command == ("start match"))          // start match command resets matchTime variable to 180 before begining the match
+  if(command == ("start"))          // start match command resets matchTime variable to 180 before begining the match
   {
     matchStatus = true;
     matchTime = 180;
@@ -59,14 +59,15 @@ void matchTimer()         // funtion that handles the timekeeping of a match
   }
 
   diffMillis = matchMillis - prevMatchMillis;         // determines time difference for later referencing during match resume
+  diffMillis = diffMillis + 100;            // buffer to prevent infinite loop
 
   if((matchMillis - prevMatchMillis) >= 1000)         // decriments the timer every 1 second
   {
-    matchTime--;
+    matchTime = matchTime - 1;
     prevMatchMillis = matchMillis;
   }
 
-  if(matchTime = 0)         // ends match at 0 second mark
+  if(matchTime == 0)         // ends match at 0 second mark
   {
     matchStatus = false;
   }
@@ -85,7 +86,7 @@ void timeDisplay()          // function to handle the display of the match timer
 
     Serial.print(matchMin);
     Serial.print(":");
-    if(matchSec < 10) `       /// if the seconds are smaller than 10 it will add a 0 to account for the missing digit
+    if(matchSec < 10)       /// if the seconds are smaller than 10 it will add a 0 to account for the missing digit
     {
       Serial.print("0");
     }
@@ -103,4 +104,10 @@ void loop()         // main loop for calling other functions
   }
 
   timeDisplay();
+
+  //Serial.println(matchStatus);          // serial debugging markers
+  //Serial.println(matchTime);
+  //Serial.println(millis());
+  //Serial.println(matchMillis);
+  //Serial.println(prevMatchMillis);
 }
