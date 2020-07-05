@@ -8,6 +8,8 @@ String command;
 int matchTime;          // match status variables
 int matchMin;
 int matchSec;
+int matchSecTens;
+int matchSecOnes;
 bool matchStatus = false;
 
 int diffMillis  = 100;         // match timekeeping variables
@@ -83,14 +85,13 @@ void timeDisplay()          // function to handle the display of the match timer
     
     matchMin = matchTime / 60;
     matchSec = matchTime % 60;
+    matchSecTens = matchSec / 10;
+    matchSecOnes = matchSec % 10;
 
     Serial.print(matchMin);
     Serial.print(":");
-    if(matchSec < 10)       /// if the seconds are smaller than 10 it will add a 0 to account for the missing digit
-    {
-      Serial.print("0");
-    }
-    Serial.println(matchSec);
+    Serial.print(matchSecTens);
+    Serial.println(matchSecOnes);
   }
 }
 
