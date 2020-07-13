@@ -1,4 +1,7 @@
-#define REFRESH_INTERVAL 500          // display refresh interval
+#define MULTIPLEX_INTERVAL 500          // multiplexing interval
+#define NUM_DIGITS 3
+
+int digit = 1;
 
 int dispMillis;         // millis variables for display refresh
 int prevDispMillis = 0;
@@ -11,6 +14,7 @@ int matchSec;
 int matchSecTens;
 int matchSecOnes;
 bool matchStatus = false;
+bool matchIntro = false;
 bool goalScored = false;          // code test parameter
 
 int diffMillis  = 100;         // match timekeeping variables
@@ -36,10 +40,10 @@ void commandHandler()         // function to handle serial command (mainly used 
     Serial.println(command);
   }
 
-  if(command == ("start"))          // start match command resets matchTime variable to 180 before begining the match
+  if(command == ("start"))          // start match command resets matchTime variable to 3 before begining the match
   {
-    matchStatus = true;
-    matchTime = 180;
+    matchIntro = true;
+    matchTime = 3;
     command = "none";
   }
 
@@ -80,29 +84,51 @@ void matchTimer()         // funtion that handles the timekeeping of a match
     prevMatchMillis = matchMillis;
   }
 
-  if(matchTime == 0)         // ends match at 0 second mark
+  if((matchTime == 0) && (matchIntro == false))         // ends match intro at 0 second mark and begins the match timer
+  {
+    matchStatus = true;
+    matchIntro = false;
+    matchTime = 180;
+  }
+
+  if((matchTime == 0) && (matchStatus == true))         // ends match at 0 second mark
   {
     matchStatus = false;
+    endAni = true;
   }
 }
 
 void timeDisplay()          // function to handle the display of the match timer
 {
+  matchMin = matchTime / 60;
+  matchSec = matchTime % 60;
+  matchSecTens = matchSec / 10;
+  matchSecOnes = matchSec % 10;
+    
   dispMillis = millis();
   
   if((dispMillis - prevDispMillis) >= REFRESH_INTERVAL)         // checks to see if the display needs to be refreshed
   {
     prevDispMillis = dispMillis;
-    
-    matchMin = matchTime / 60;
-    matchSec = matchTime % 60;
-    matchSecTens = matchSec / 10;
-    matchSecOnes = matchSec % 10;
 
-    Serial.print(matchMin);
-    Serial.print(":");
-    Serial.print(matchSecTens);
-    Serial.println(matchSecOnes);
+    if(digit == 1)
+    {
+      Serial.print(matchMin);
+      Serial.print(":");
+      digit++;
+    }
+
+    if(digit == 2)
+    {
+      Serial.print(matchSecTens);
+      digit++;
+    }
+
+    if(digit == 3)
+    {
+      Serial.println(matchSecOnes);
+      digit = 1;
+    }
   }
 }
 
@@ -119,18 +145,18 @@ void animationHandler()
 {
   if(startAni)
   {
-    //startup animation
+    // insert startup animation
     startAni = false;
   }
 
   if(endAni);
   {
-    //match end animation
+    // insert match end animation
     endAni = false;
   }
   if(goalAni)
   {
-    //goal animation
+    // insert goal animation
     goalAni = false;
   }
 }
@@ -141,7 +167,7 @@ void loop()         // main loop for calling other functions
 
   goalDetection();
   
-  if(matchStatus)
+  if((matchStatus > 0) || (matchIntro > 0))         // the timer will run when both the intro and match time are called for
   {
     matchTimer();
   }
