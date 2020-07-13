@@ -11,10 +11,15 @@ int matchSec;
 int matchSecTens;
 int matchSecOnes;
 bool matchStatus = false;
+bool goalScored = false;          // code test parameter
 
 int diffMillis  = 100;         // match timekeeping variables
 int matchMillis;
 int prevMatchMillis = 0;
+
+bool startAni = false;
+bool endAni = false;
+bool goalAni = false;
 
 void setup() 
 {
@@ -47,6 +52,12 @@ void commandHandler()         // function to handle serial command (mainly used 
   if(command == ("resume"))
   {
     matchStatus = true;
+    command = "none";
+  }
+
+  if(command == ("goal"))
+  {
+    goalScored = true;
     command = "none";
   }
 }
@@ -95,9 +106,40 @@ void timeDisplay()          // function to handle the display of the match timer
   }
 }
 
+void goalDetection()
+{
+  if(goalScored)          // temporary parameter for testing without hardware
+  {
+    matchStatus = false;
+    goalAni = true
+  }
+}
+
+void animationHandler()
+{
+  if(startAni)
+  {
+    //startup animation
+    startAni = false;
+  }
+
+  if(endAni);
+  {
+    //match end animation
+    endAni = false;
+  }
+  if(goalAni)
+  {
+    //goal animation
+    goalAni = false;
+  }
+}
+
 void loop()         // main loop for calling other functions
 {
   commandHandler();
+
+  goalDetection();
   
   if(matchStatus)
   {
@@ -105,4 +147,6 @@ void loop()         // main loop for calling other functions
   }
 
   timeDisplay();
+
+  animationHandler();
 }
