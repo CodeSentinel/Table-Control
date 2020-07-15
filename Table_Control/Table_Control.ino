@@ -1,4 +1,4 @@
-#include "libs/FastLED/FastLED.h"
+#include "libs/FastLED/FastLED.h"         // version 3.3.3
 
 #define REFRESH_INTERVAL 500          // time refresh interval in milliseconds
 
