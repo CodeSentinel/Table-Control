@@ -1,7 +1,4 @@
-#define MULTIPLEX_INTERVAL 500          // multiplexing interval
-#define NUM_DIGITS 3
-
-int digit = 1;
+#define REFRESH_INTERVAL 500          // time refresh interval in milliseconds
 
 int dispMillis;         // millis variables for display refresh
 int prevDispMillis = 0;
@@ -43,7 +40,7 @@ void commandHandler()         // function to handle serial command (mainly used 
   if(command == ("start"))          // start match command resets matchTime variable to 3 before begining the match
   {
     matchIntro = true;
-    matchTime = 3;
+    matchTime = 3;          // countdown timer length
     command = "none";
   }
 
@@ -110,25 +107,11 @@ void timeDisplay()          // function to handle the display of the match timer
   if((dispMillis - prevDispMillis) >= REFRESH_INTERVAL)         // checks to see if the display needs to be refreshed
   {
     prevDispMillis = dispMillis;
-
-    if(digit == 1)
-    {
-      Serial.print(matchMin);
-      Serial.print(":");
-      digit++;
-    }
-
-    if(digit == 2)
-    {
-      Serial.print(matchSecTens);
-      digit++;
-    }
-
-    if(digit == 3)
-    {
-      Serial.println(matchSecOnes);
-      digit = 1;
-    }
+    
+    Serial.print(matchMin);
+    Serial.print(":");
+    Serial.print(matchSecTens);
+    Serial.println(matchSecOnes);
   }
 }
 
