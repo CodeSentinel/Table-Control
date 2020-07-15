@@ -1,3 +1,5 @@
+#include "libs/FastLED/FastLED.h"
+
 #define REFRESH_INTERVAL 500          // time refresh interval in milliseconds
 
 int dispMillis;         // millis variables for display refresh
@@ -120,7 +122,7 @@ void goalDetection()
   if(goalScored)          // temporary parameter for testing without hardware
   {
     matchStatus = false;
-    goalAni = true
+    goalAni = true;
   }
 }
 
