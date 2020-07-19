@@ -13,7 +13,6 @@ int matchSec;
 int matchSecTens;
 int matchSecOnes;
 bool matchStatus = false;
-bool matchIntro = false;
 bool goalScored = false;          // code test parameter
 
 int diffMillis  = 100;         // match timekeeping variables
@@ -34,34 +33,39 @@ void commandHandler()         // function to handle serial command (mainly used 
 {
   if(Serial.available())          // checks for a command in the serial port and writes it to a string if available
   {
+    delay(2);         // allows string to fully enter buffer for reading
     command = Serial.readString();
     Serial.print("Recieved Command: ");
     Serial.println(command);
   }
 
-  if(command == ("start"))          // start match command resets matchTime variable to 3 before begining the match
+  if(command == "start")          // start match command resets matchTime variable to 3 before begining the match
   {
-    matchIntro = true;
-    matchTime = 3;          // countdown timer length
+    matchStatus = true;
+    matchTime = 180;          // countdown timer length
     command = "none";
+    Serial.println("start executed");         // debugging
   }
 
-  if(command == ("pause"))
+  if(command == "pause")
   {
     matchStatus = false;
     command = "none";
+    Serial.println("pause executed");         // debugging
   }
 
-  if(command == ("resume"))
+  if(command == "resume")
   {
     matchStatus = true;
     command = "none";
+    Serial.println("resume executed");          // debugging
   }
 
-  if(command == ("goal"))
+  if(command == "goal")
   {
     goalScored = true;
     command = "none";
+    Serial.println("goal executed");          // debugging
   }
 }
 
@@ -75,7 +79,7 @@ void matchTimer()         // funtion that handles the timekeeping of a match
   }
 
   diffMillis = matchMillis - prevMatchMillis;         // determines time difference for later referencing during match resume
-  diffMillis = diffMillis + 100;            // buffer to prevent infinite loop
+  diffMillis = diffMillis + 100;            // buffer to allow low time differences between loops
 
   if((matchMillis - prevMatchMillis) >= 1000)         // decriments the timer every 1 second
   {
@@ -83,14 +87,7 @@ void matchTimer()         // funtion that handles the timekeeping of a match
     prevMatchMillis = matchMillis;
   }
 
-  if((matchTime == 0) && (matchIntro == false))         // ends match intro at 0 second mark and begins the match timer
-  {
-    matchStatus = true;
-    matchIntro = false;
-    matchTime = 180;
-  }
-
-  if((matchTime == 0) && (matchStatus == true))         // ends match at 0 second mark
+  if(matchTime == 0)         // ends match at 0 second mark
   {
     matchStatus = false;
     endAni = true;
@@ -117,12 +114,15 @@ void timeDisplay()          // function to handle the display of the match timer
   }
 }
 
+
+
 void goalDetection()
 {
   if(goalScored)          // temporary parameter for testing without hardware
   {
     matchStatus = false;
     goalAni = true;
+    goalScored = false;
   }
 }
 
@@ -152,7 +152,7 @@ void loop()         // main loop for calling other functions
 
   goalDetection();
   
-  if((matchStatus > 0) || (matchIntro > 0))         // the timer will run when both the intro and match time are called for
+  if(matchStatus)         // timer runs only when the match status is true
   {
     matchTimer();
   }
