@@ -1,21 +1,24 @@
 #include "libs/FastLED/FastLED.h"         // version 3.3.3
+#include <SPI.h>                          // built in no library file necessary
+#include <SD.h>                           // built in no library file necessary
 
-#define REFRESH_INTERVAL 500          // time refresh interval in milliseconds
+#define REFRESH_INTERVAL 500              // time refresh interval in milliseconds
 
-int dispMillis;         // millis variables for display refresh
+int dispMillis;                           // millis variables for display refresh
 int prevDispMillis = 0;
 
 String command;
 
-int matchTime;          // match status variables
+int matchTime;                            // match status variables
 int matchMin;
 int matchSec;
 int matchSecTens;
 int matchSecOnes;
 bool matchStatus = false;
-bool goalScored = false;          // code test parameter
+bool goalAScored = false;                  // code test parameter
+bool goalBScored = false;
 
-int diffMillis  = 100;         // match timekeeping variables
+int diffMillis  = 100;                    // match timekeeping variables
 int matchMillis;
 int prevMatchMillis = 0;
 
@@ -26,32 +29,32 @@ bool goalAni = false;
 void setup() 
 {
   Serial.begin(9600);
-  Serial.println("System Start");
+  Serial.println("Initialization Complete");
 }
 
-void commandHandler()         // function to handle serial command (mainly used for serial line commands during prototyping)
+void commandHandler()                    // function to handle serial command (mainly used for serial line commands during prototyping)
 {
-  if(Serial.available())          // checks for a command in the serial port and writes it to a string if available
+  if(Serial.available())                 // checks for a command in the serial port and writes it to a string if available
   {
-    delay(2);         // allows string to fully enter buffer for reading
+    delay(2);                            // allows string to fully enter buffer for reading
     command = Serial.readString();
     Serial.print("Recieved Command: ");
     Serial.println(command);
   }
 
-  if(command == "start")          // start match command resets matchTime variable to 3 before begining the match
+  if(command == "start")                // start match command resets matchTime variable to 3 before begining the match
   {
     matchStatus = true;
-    matchTime = 180;          // countdown timer length
+    matchTime = 180;                    // countdown timer length
     command = "none";
-    Serial.println("start executed");         // debugging
+    Serial.println("start executed");            // debugging
   }
 
   if(command == "pause")
   {
     matchStatus = false;
     command = "none";
-    Serial.println("pause executed");         // debugging
+    Serial.println("pause executed");           // debugging
   }
 
   if(command == "resume")
@@ -61,15 +64,22 @@ void commandHandler()         // function to handle serial command (mainly used 
     Serial.println("resume executed");          // debugging
   }
 
-  if(command == "goal")
+  if(command == "goal a")
   {
-    goalScored = true;
+    goalAScored = true;
     command = "none";
-    Serial.println("goal executed");          // debugging
+    Serial.println("goal a executed");           // debugging
+  }
+
+  if(command == "goal b")
+  {
+    goalBScored = true;
+    command = "none";
+    Serial.println("goal b executed");             // debugging
   }
 }
 
-void matchTimer()         // funtion that handles the timekeeping of a match
+void matchTimer()                                // function that handles the timekeeping of a match
 {
   matchMillis = millis();
 
@@ -78,23 +88,23 @@ void matchTimer()         // funtion that handles the timekeeping of a match
     prevMatchMillis = matchMillis - diffMillis;
   }
 
-  diffMillis = matchMillis - prevMatchMillis;         // determines time difference for later referencing during match resume
-  diffMillis = diffMillis + 100;            // buffer to allow low time differences between loops
+  diffMillis = matchMillis - prevMatchMillis;          // determines time difference for later referencing during match resume
+  diffMillis = diffMillis + 100;                       // buffer to allow low time differences between loops
 
-  if((matchMillis - prevMatchMillis) >= 1000)         // decriments the timer every 1 second
+  if((matchMillis - prevMatchMillis) >= 1000)          // decriments the timer every 1 second
   {
     matchTime = matchTime - 1;
     prevMatchMillis = matchMillis;
   }
 
-  if(matchTime == 0)         // ends match at 0 second mark
+  if(matchTime == 0)                                   // ends match at 0 second mark
   {
     matchStatus = false;
     endAni = true;
   }
 }
 
-void timeDisplay()          // function to handle the display of the match timer
+void timeDisplay()                                    // function to handle the display of the match timer
 {
   matchMin = matchTime / 60;
   matchSec = matchTime % 60;
@@ -118,11 +128,18 @@ void timeDisplay()          // function to handle the display of the match timer
 
 void goalDetection()
 {
-  if(goalScored)          // temporary parameter for testing without hardware
+  if(goalAScored)                      // temporary parameter for testing without hardware
   {
     matchStatus = false;
     goalAni = true;
-    goalScored = false;
+    goalAScored = false;
+  }
+
+  if(goalBScored)
+  {
+    matchStatus = false;
+    goalAni = true;
+    goalBScored = false;
   }
 }
 
@@ -146,13 +163,13 @@ void animationHandler()
   }
 }
 
-void loop()         // main loop for calling other functions
+void loop()                      // main loop for calling other functions
 {
   commandHandler();
 
   goalDetection();
   
-  if(matchStatus)         // timer runs only when the match status is true
+  if(matchStatus)                // timer runs only when the match status is true
   {
     matchTimer();
   }
