@@ -1,6 +1,6 @@
 #include "libs/FastLED/FastLED.h"     // version 3.3.3
 
-#define REFRESH_INTERVAL 500          // time refresh interval in milliseconds
+#define REFRESH_INTERVAL 2          // time display refresh interval in milliseconds
 
 int dispMillis;                       // millis variables for display refresh
 int prevDispMillis = 0;
@@ -37,6 +37,16 @@ bool segMinsA = 0;
 bool segMinsB = 0;
 bool segMinsC = 0;
 bool segMinsD = 0;
+
+//Variables for POV effect for scoreboard
+byte segmentOn = 0;       //Which segment should turn on
+bool bcdOut1 = 0;         //A,B,C,D pins of the 74LS47
+bool bcdOut2 = 0;
+bool bcdOut3 = 0;
+bool bcdOut4 = 0;
+bool segMOS1 = 0;         //Transistors that control current flow through
+bool segMOS2 = 0;         // each segment
+bool segMOS3 = 0;
 
 void setup() 
 {
@@ -114,17 +124,53 @@ void matchTimer()         // funtion that handles the timekeeping of a match
 
 void timeDisplay()          // Function to display match time on 7-seg array
 {
-    
   dispMillis = millis();
   
   if((dispMillis - prevDispMillis) >= REFRESH_INTERVAL)         // checks to see if the display needs to be refreshed
   {
+    segMOS1 = LOW;    //Turn off the transistors during transition phase
+    segMOS2 = LOW;
+    segMOS3 = LOW;
+    switch(segmentOn)
+    {
+      case 0:   //The ones place of seconds will illuminate
+        bcdOut1 = segOnesA;
+        bcdOut2 = segOnesB;
+        bcdOut3 = segOnesC;
+        bcdOut4 = segOnesD;
+        segMOS1 = HIGH;       //Turn on transistor for ones of match second
+        break;
+      case 1:
+        bcdOut1 = segTensA;
+        bcdOut2 = segTensB;
+        bcdOut3 = segTensC;
+        bcdOut4 = segTensD;
+        segMOS2 = HIGH;
+        break;
+      case 2:
+        bcdOut1 = segMinsA;
+        bcdOut2 = segMinsB;
+        bcdOut3 = segMinsC;
+        bcdOut4 = segMinsD;
+        segMOS3 = HIGH;
+      default:
+        Serial.println("How did we get here?");
+    }
+
+    if(segmentOn >=2)
+    {
+      segmentOn = 0;
+    }
+    else
+    {
+      segmentOn+= 1;
+    }
     prevDispMillis = dispMillis;
-    
+    /*
     Serial.print(matchMins);
     Serial.print(":");
     Serial.print(matchSecTens);
-    Serial.println(matchSecOnes);
+    Serial.println(matchSecOnes);*/
   }
 }
 
