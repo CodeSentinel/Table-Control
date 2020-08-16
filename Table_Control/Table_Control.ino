@@ -4,6 +4,7 @@
 
 int dispMillis;         // millis variables for display refresh
 int prevDispMillis = 0;
+int IRSensor = 2; // connect ir sensor to pin 2
 
 String command;
 
@@ -27,6 +28,7 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("System Start");
+  pinMode(IRSensor, INPUT);     // the ir_sensor is an input
 }
 
 void commandHandler()         // function to handle serial command (mainly used for serial line commands during prototyping)
@@ -118,7 +120,8 @@ void timeDisplay()          // function to handle the display of the match timer
 
 void goalDetection()
 {
-  if(goalScored)          // temporary parameter for testing without hardware
+  int sensor = digitalRead(IRSensor);       // sensor == 1 means object detected (goal), sensor == 0 means no object detected (no goal)
+  if(sensor == 1)          
   {
     matchStatus = false;
     goalAni = true;
