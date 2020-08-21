@@ -1,6 +1,7 @@
 #include "libs/FastLED/FastLED.h"         // version 3.3.3
 
 #define REFRESH_INTERVAL 500          // time refresh interval in milliseconds
+#define IR_SENSOR 2                   // connect ir sensor to pin 2
 
 int dispMillis;         // millis variables for display refresh
 int prevDispMillis = 0;
@@ -27,6 +28,7 @@ void setup()
 {
   Serial.begin(9600);
   Serial.println("System Start");
+  pinMode(IR_SENSOR, INPUT);                // set pin 2 as input
 }
 
 void commandHandler()         // function to handle serial command (mainly used for serial line commands during prototyping)
@@ -118,7 +120,8 @@ void timeDisplay()          // function to handle the display of the match timer
 
 void goalDetection()
 {
-  if(goalScored)          // temporary parameter for testing without hardware
+  goalScored = digitalRead(IR_SENSOR) == 1 ? true : false;    // sensor == 1 means object detected (goal), sensor == 0 means no object detected (no goal)
+  if(goalScored)                                              // temporary parameter for testing without hardware
   {
     matchStatus = false;
     goalAni = true;
