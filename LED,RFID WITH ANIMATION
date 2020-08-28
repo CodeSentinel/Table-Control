@@ -1,0 +1,253 @@
+#include <SPI.h>
+#include <MFRC522.h>
+#include <Servo.h>
+ 
+#define SS_PIN 10
+#define RST_PIN 9
+#include <FastLED.h>
+#define NUM_LEDS 60
+#define DATA_PIN 6
+#define BRIGHTNESS_MAX 105  
+
+CRGBArray<NUM_LEDS> matrixLEDs;
+//Variables for code functions, like light mode and color values
+byte globalHue = 100;
+byte globalSat = 255;
+byte globalVal = BRIGHTNESS_MAX;
+MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
+Servo myServo; //define servo name
+ 
+void setup() 
+{
+  Serial.begin(9600);   // Initiate a serial communication
+  SPI.begin();      // Initiate  SPI bus
+  FastLED.addLeds<WS2812B, DATA_PIN, GRB>(matrixLEDs, NUM_LEDS);  //Initialization of the FastLED system
+  
+  mfrc522.PCD_Init();   // Initiate MFRC522
+  myServo.attach(3); //servo pin
+  myServo.write(0); //servo start position
+
+  Serial.println("Put your card to the reader...");
+  Serial.println();
+  
+}
+
+void loop() 
+{
+  // Look for new cards
+  if ( ! mfrc522.PICC_IsNewCardPresent()) 
+  {
+    return;
+  }
+  // Select one of the cards
+  if ( ! mfrc522.PICC_ReadCardSerial()) 
+  {
+    return;
+  }
+  //Show UID on serial monitor
+  Serial.print("UID tag :");
+  String content= "";
+  byte letter;
+  for (byte i = 0; i < mfrc522.uid.size; i++) 
+  {
+     Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+     Serial.print(mfrc522.uid.uidByte[i], HEX);
+     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
+     content.concat(String(mfrc522.uid.uidByte[i], HEX));
+  }
+  Serial.println();
+  Serial.print("Message : ");
+  content.toUpperCase();
+ int y;//this number will change and affect the case function
+ 
+  
+  {
+ if (content.substring(1) == "86 70 F9 23") //Key card UID
+  {
+    Serial.println("ENTERING TEAM Z");
+
+    FastLED.clear();
+
+  y=2;//for the case function 
+  }
+  }
+  {
+  if (content.substring(1) == "05 6A F6 22") //Key card UID
+  {
+    Serial.println("ENTERING TEAM Y");
+    
+  FastLED.clear();
+
+ y=3;
+ 
+  }
+  }
+  {  
+ if (content.substring(1) == "76 AE B9 23") //Key card UID
+  {
+      Serial.println("CLEAR"); //Clears the entire board
+      FastLED.clear();
+      FastLED.show();
+      y=0;
+  }
+  }
+ 
+  switch(y) 
+{
+  
+  case 0:  //clear
+  FastLED.clear();
+   FastLED.show();
+    break;
+  
+  case 1:
+     for(int i = 0; i <= 4; i++)     //Key card UID
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(0,206,250);
+      FastLED.show();
+      delay(10);
+    }
+  }
+  
+      break;
+  
+  case 2: //Periwinkle, orange , green, pink
+       for(int i = 0; i <= 4; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(135,206,250);//periwinkle
+      FastLED.show();
+      delay(10);
+    }
+  }
+  for(int i = 5; i <= 10; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB( 255,69,0); //orange
+      FastLED.show();
+      delay(10);
+    }
+  }
+   for(int i = 11; i <= 15; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(124,252,0); //green
+      FastLED.show();
+      delay(10);
+    }
+  }
+  for(int i = 16; i <= 20; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(255,20,120); //dark pink
+      FastLED.show();
+      delay(10);
+    }
+  }
+   
+  
+      break;
+
+  case 3: 
+    for(int i = 11; i <= 15; i++)
+  {
+    
+    
+      matrixLEDs[i] = CRGB(124,252,0); //green
+      FastLED.show();
+     
+    }
+      break;      
+  
+      case 4: 
+    for(int i = 11; i <= 15; i++)
+  {
+    
+    
+      matrixLEDs[i] = CRGB(124,252,0); //green
+      FastLED.show();
+     
+    }
+      break;      
+    
+  }
+ if (content.substring(1) == "79 E8 24 B3")//Key card UID
+  FastLED.clear();
+  {
+    Serial.println("ENTERING TEAM X");
+
+      FastLED.clear();
+     for(int x = 0; x <= 4; x++)
+  {
+    
+    {
+      switch(x) //for animation
+      {
+       case 0:
+     for(int i = 0; i <= 4; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(0,206,250);
+      FastLED.show();
+      delay(10);
+    }
+  }
+  
+      break;
+      
+      case 1:
+     for(int i = 0; i <= 12; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(0,0,250);
+      FastLED.show();
+      
+    }
+  }
+  
+      break;
+      
+      case 2:
+     for(int i = 0; i <= 4; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(150,0,0);
+      FastLED.show();
+      delay(10);
+    }
+  }
+  
+      break;
+      
+      case 3:
+     for(int i = 0; i <= 4; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(0,106,0);
+      FastLED.show();
+      delay(10);
+    }
+  }
+  
+      break;
+        }
+    }
+  }
+  }
+ 
+   
+  
+
+}
+  
+ 
