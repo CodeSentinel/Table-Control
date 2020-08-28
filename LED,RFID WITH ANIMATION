@@ -7,7 +7,7 @@
 #include <FastLED.h>
 #define NUM_LEDS 60
 #define DATA_PIN 6
-#define BRIGHTNESS_MAX 105  
+#define BRIGHTNESS_MAX 105  //Make this multiple of 15 because of my loop!
 
 CRGBArray<NUM_LEDS> matrixLEDs;
 //Variables for code functions, like light mode and color values
@@ -60,8 +60,74 @@ void loop()
   content.toUpperCase();
  int y;//this number will change and affect the case function
  
-  
+  if (content.substring(1) == "86 34 A9 23")//Animated keycard
+
   {
+    Serial.println("ENTERING TEAM X");
+
+      y=0;
+     for(int x = 0; x <= 4; x++)
+  {
+    
+    {
+      switch(x) //for animation
+      {
+       case 0:
+     for(int i = 0; i <= 4; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(0,206,250);
+      FastLED.show();
+      delay(10);
+    }
+  }
+  
+      break;
+      
+      case 1:
+     for(int i = 0; i <= 12; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(0,0,250);
+      FastLED.show();
+      
+    }
+  }
+  
+      break;
+      
+      case 2:
+     for(int i = 0; i <= 4; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(150,0,0);
+      FastLED.show();
+      delay(100);
+    }
+  }
+  
+      break;
+      
+      case 3:
+     for(int i = 0; i <= 4; i++)
+  {
+    
+    {
+      matrixLEDs[i] = CRGB(0,106,0);
+      FastLED.show();
+      delay(1000);
+    }
+  }
+  
+      break;
+        }
+    }
+  }
+  }
+  
  if (content.substring(1) == "86 70 F9 23") //Key card UID
   {
     Serial.println("ENTERING TEAM Z");
@@ -70,7 +136,7 @@ void loop()
 
   y=2;//for the case function 
   }
-  }
+  
   {
   if (content.substring(1) == "05 6A F6 22") //Key card UID
   {
@@ -85,7 +151,7 @@ void loop()
   {  
  if (content.substring(1) == "76 AE B9 23") //Key card UID
   {
-      Serial.println("CLEAR"); //Clears the entire board
+      Serial.println("CLEAR");
       FastLED.clear();
       FastLED.show();
       y=0;
@@ -95,8 +161,8 @@ void loop()
   switch(y) 
 {
   
-  case 0:  //clear
-  FastLED.clear();
+  case 0:  //clears
+   FastLED.clear();
    FastLED.show();
     break;
   
@@ -177,77 +243,7 @@ void loop()
       break;      
     
   }
- if (content.substring(1) == "79 E8 24 B3")//Key card UID
-  FastLED.clear();
-  {
-    Serial.println("ENTERING TEAM X");
-
-      FastLED.clear();
-     for(int x = 0; x <= 4; x++)
-  {
-    
-    {
-      switch(x) //for animation
-      {
-       case 0:
-     for(int i = 0; i <= 4; i++)
-  {
-    
-    {
-      matrixLEDs[i] = CRGB(0,206,250);
-      FastLED.show();
-      delay(10);
-    }
-  }
-  
-      break;
-      
-      case 1:
-     for(int i = 0; i <= 12; i++)
-  {
-    
-    {
-      matrixLEDs[i] = CRGB(0,0,250);
-      FastLED.show();
-      
-    }
-  }
-  
-      break;
-      
-      case 2:
-     for(int i = 0; i <= 4; i++)
-  {
-    
-    {
-      matrixLEDs[i] = CRGB(150,0,0);
-      FastLED.show();
-      delay(10);
-    }
-  }
-  
-      break;
-      
-      case 3:
-     for(int i = 0; i <= 4; i++)
-  {
-    
-    {
-      matrixLEDs[i] = CRGB(0,106,0);
-      FastLED.show();
-      delay(10);
-    }
-  }
-  
-      break;
-        }
-    }
-  }
-  }
  
-   
-  
-
 }
   
  
