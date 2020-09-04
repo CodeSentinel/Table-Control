@@ -3,6 +3,7 @@
 #include <SD.h>                           // built in no library file necessary
 
 #define REFRESH_INTERVAL 500              // time refresh interval in milliseconds
+#define IR_SENSOR 2                   // connect ir sensor to pin 2
 
 int dispMillis;                           // millis variables for display refresh
 int prevDispMillis = 0;
@@ -39,6 +40,8 @@ void setup()
     while(1);
   }
   Serial.println("Initialization Complete");
+  
+  pinMode(IR_SENSOR, INPUT);                // set pin 2 as input
 }
 
 void commandHandler()                            // function to handle serial command (mainly used for serial line commands during prototyping)
