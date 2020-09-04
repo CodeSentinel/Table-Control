@@ -26,26 +26,35 @@ bool startAni = false;
 bool endAni = false;
 bool goalAni = false;
 
+File gameFile;
+
 void setup() 
 {
   Serial.begin(9600);
+  Serial.println("System Initializing");
+
+  if(!SD.begin())
+  {
+    Serial.println("SD Failed");
+    while(1);
+  }
   Serial.println("Initialization Complete");
 }
 
-void commandHandler()                    // function to handle serial command (mainly used for serial line commands during prototyping)
+void commandHandler()                            // function to handle serial command (mainly used for serial line commands during prototyping)
 {
-  if(Serial.available())                 // checks for a command in the serial port and writes it to a string if available
+  if(Serial.available())                         // checks for a command in the serial port and writes it to a string if available
   {
-    delay(2);                            // allows string to fully enter buffer for reading
+    delay(2);                                    // allows string to fully enter buffer for reading
     command = Serial.readString();
     Serial.print("Recieved Command: ");
     Serial.println(command);
   }
 
-  if(command == "start")                // start match command resets matchTime variable to 3 before begining the match
+  if(command == "start")                         // start match command resets matchTime variable to 3 before begining the match
   {
     matchStatus = true;
-    matchTime = 180;                    // countdown timer length
+    matchTime = 180;                             // countdown timer length
     command = "none";
     Serial.println("start executed");            // debugging
   }
@@ -128,11 +137,16 @@ void timeDisplay()                                    // function to handle the 
 
 void goalDetection()
 {
-  if(goalAScored)                      // temporary parameter for testing without hardware
+  gameFile = SD.open("gamelogs.txt", FILE_WRITE);
+  
+  if(goalAScored)                                    // temporary parameter for testing without hardware
   {
     matchStatus = false;
     goalAni = true;
     goalAScored = false;
+    gameFile.print(matchTime);
+    gameFile.print(" -- ");
+    gameFile.println("Team A scored");
   }
 
   if(goalBScored)
@@ -140,7 +154,12 @@ void goalDetection()
     matchStatus = false;
     goalAni = true;
     goalBScored = false;
+    gameFile.print(matchTime);
+    gameFile.print(" -- ");
+    gameFile.println("Team B Scored");
   }
+
+  gameFile.close();
 }
 
 void animationHandler()
