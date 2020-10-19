@@ -8,7 +8,8 @@ int prevDispMillis = 0;
 
 String command;
 
-int matchTime;          // match status variables
+// match status variables
+int matchTime;                  //Total match time of 180 seconds   
 int matchMin;
 int matchSec;
 int matchSecTens;
@@ -115,8 +116,6 @@ void timeDisplay()          // function to handle the display of the match timer
     Serial.println(matchSecOnes);
   }
 }
-
-
 
 void goalDetection()
 {
