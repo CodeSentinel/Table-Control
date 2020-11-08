@@ -3,12 +3,19 @@
 #include <SD.h>                           // built in no library file necessary
 
 #define REFRESH_INTERVAL 500              // time refresh interval in milliseconds
-#define IR_SENSOR 2                   // connect ir sensor to pin 2
+#define IR_SENSOR 2                       // connect ir sensor to pin 2
+
+#define MAX_TEAMS 12                      // maximum number of teams allowed in the system   
+
+int numTeams = 0;                         // general team information
+String teamNames[MAX_TEAMS];
+String teamColors[MAX_TEAMS];
+String teamIDs[MAX_TEAMS];
 
 int dispMillis;                           // millis variables for display refresh
 int prevDispMillis = 0;
 
-String command;
+String command;                           // variable for accepting serial commands
 
 int matchTime;                            // match status variables
 int matchMin;
@@ -19,7 +26,7 @@ bool matchStatus = false;
 bool goalAScored = false;                  // code test parameter
 bool goalBScored = false;
 
-int diffMillis  = 100;                    // match timekeeping variables
+int diffMillis  = 100;                     // match timekeeping variables
 int matchMillis;
 int prevMatchMillis = 0;
 
@@ -27,6 +34,7 @@ bool startAni = false;
 bool endAni = false;
 bool goalAni = false;
 
+File teamFile;
 File gameFile;
 
 void setup() 
@@ -39,9 +47,24 @@ void setup()
     Serial.println("SD Failed");
     while(1);
   }
-  Serial.println("Initialization Complete");
+
+  pinMode(IR_SENSOR, INPUT);                    // set pin 2 as an input
+
+  teamFile = SD.open("teaminfo.txt", FILE_READ);
+
+  while(teamFile.available())
+  {
+    teamNames[numTeams] = teamFile.readStringUntil(',');
+    teamColors[numTeams] = teamFile.readStringUntil(',');
+    teamIDs[numTeams] = teamFile.readStringUntil(',');
+    numTeams++;
+  }
+
+  teamFile.close();
   
-  pinMode(IR_SENSOR, INPUT);                // set pin 2 as input
+  Serial.print(numTeams);
+  Serial.println(" Teams Loaded");
+  Serial.println("Initialization Complete");
 }
 
 void commandHandler()                            // function to handle serial command (mainly used for serial line commands during prototyping)
