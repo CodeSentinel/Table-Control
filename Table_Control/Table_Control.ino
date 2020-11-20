@@ -50,9 +50,9 @@ void setup()
 
   pinMode(IR_SENSOR, INPUT);                    // set pin 2 as an input
 
-  teamFile = SD.open("teaminfo.txt", FILE_READ);
+  teamFile = SD.open("teaminfo.txt", FILE_READ);          // open team info file
 
-  while(teamFile.available())
+  while(teamFile.available())                   // collect team data
   {
     teamNames[numTeams] = teamFile.readStringUntil(',');
     teamColors[numTeams] = teamFile.readStringUntil(',');
@@ -60,7 +60,7 @@ void setup()
     numTeams++;
   }
 
-  teamFile.close();
+  teamFile.close();             // close team info file to allow access to other files later
   
   Serial.print(numTeams);
   Serial.println(" Teams Loaded");
