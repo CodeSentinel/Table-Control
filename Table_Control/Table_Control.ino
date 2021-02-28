@@ -1,4 +1,4 @@
-//#include "libs/FastLED/FastLED.h"         // version 3.3.3
+#include "libs/FastLED/src/FastLED.h"     // version 3.4.0
 #include <SPI.h>                          // built in no library file necessary
 #include <SD.h>                           // built in no library file necessary
 
