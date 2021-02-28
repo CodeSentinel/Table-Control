@@ -31,12 +31,20 @@ int diffMillis  = 100;                     // match timekeeping variables
 int matchMillis;
 int prevMatchMillis = 0;
 
-bool startAni = false;
+bool startAni = false;                     // animation triggers
 bool endAni = false;
 bool goalAni = false;
 
-File teamFile;                             // SD card file for storing team files
-File gameFile;                             // SD card file for storing game statistics
+File teamFile;                             // stores relevant team files
+File gameFile;                             // stores game statistics
+File aniFile;                              // Stores active SD animation
+
+int numLed = 0;                            // animation variables
+int h = 0;
+int s = 0;
+int v = 0;
+int frameRate = 1000;                      // set to 1000 for obvious errors
+String aniString;                          // placeholder during string to char conversion
 
 void setup() 
 {
@@ -46,22 +54,25 @@ void setup()
   if(!SD.begin())
   {
     Serial.println("SD Failed");
-    while(1);
   }
-
-  pinMode(IR_SENSOR, INPUT);                       // set pin 2 as an input
-
-  teamFile = SD.open("teaminfo.txt", FILE_READ);          // open team info filew
-
-  while(teamFile.available())                     // collect team data from SD card and store in variables
+  else
   {
-    teamNames[numTeams] = teamFile.readStringUntil(',');
-    teamColors[numTeams] = teamFile.readStringUntil(',');
-    teamIDs[numTeams] = teamFile.readStringUntil(',');
-    numTeams++;
+    teamFile = SD.open("teaminfo.txt", FILE_READ);          // open team info filew
+
+    while(teamFile.available())                     // collect team data from SD card and store in variables
+    {
+      teamNames[numTeams] = teamFile.readStringUntil(',');
+      teamColors[numTeams] = teamFile.readStringUntil(',');
+      teamIDs[numTeams] = teamFile.readStringUntil(',');
+      numTeams++;
+    }
+
+    teamFile.close();                               // close team info file to allow access to other files later
   }
 
-  teamFile.close();                               // close team info file to allow access to other files later
+  pinMode(IR_SENSOR, INPUT);                        // set pin 2 as an input
+
+
   
   Serial.print(numTeams);
   Serial.println(" Teams Loaded");
@@ -160,8 +171,6 @@ void timeDisplay()                                    // function to handle the 
   }
 }
 
-
-
 void goalDetection()
 {
   gameFile = SD.open("gamelogs.txt", FILE_WRITE);
@@ -206,6 +215,30 @@ void animationHandler()
   {
     // insert goal animation
     goalAni = false;
+  }
+}
+
+void sdAnimation()
+{
+  aniFile = SD.open("anifile.txt",FILE_READ);
+
+  aniString = aniFile.readStringUntil(';');
+  frameRate = aniString.toInt();
+
+  while(aniFile.available())
+  {
+    aniString = aniFile.readStringUntil(';');
+    numLed = aniString.toInt();
+    aniString = aniFile.readStringUntil(';');
+    h = aniString.toInt();
+    aniString = aniFile.readStringUntil(';');
+    s = aniString.toInt();
+    aniString = aniFile.readStringUntil(';');
+    v = aniString.toInt();
+
+    // insert fastLED functions
+    
+    delay(frameRate);
   }
 }
 
