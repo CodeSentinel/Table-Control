@@ -1,4 +1,4 @@
-#include "libs/FastLED/FastLED.h"         // version 3.3.3
+//#include "libs/FastLED/FastLED.h"         // version 3.3.3
 #include <SPI.h>                          // built in no library file necessary
 #include <SD.h>                           // built in no library file necessary
 
@@ -15,7 +15,7 @@ String teamIDs[MAX_TEAMS];
 int dispMillis;                           // millis variables for display refresh
 int prevDispMillis = 0;
 
-String command;                           // variable for accepting serial commands
+String command;                           // variable for accepting serial commands (prototyping and debugging)
 
 int matchTime;                            // match status variables
 int matchMin;
@@ -23,7 +23,8 @@ int matchSec;
 int matchSecTens;
 int matchSecOnes;
 bool matchStatus = false;
-bool goalAScored = false;                  // code test parameter
+
+bool goalAScored = false;                  // code test parameters
 bool goalBScored = false;
 
 int diffMillis  = 100;                     // match timekeeping variables
@@ -34,8 +35,8 @@ bool startAni = false;
 bool endAni = false;
 bool goalAni = false;
 
-File teamFile;
-File gameFile;
+File teamFile;                             // SD card file for storing team files
+File gameFile;                             // SD card file for storing game statistics
 
 void setup() 
 {
@@ -52,7 +53,7 @@ void setup()
 
   teamFile = SD.open("teaminfo.txt", FILE_READ);          // open team info filew
 
-  while(teamFile.available())                     // collect team data
+  while(teamFile.available())                     // collect team data from SD card and store in variables
   {
     teamNames[numTeams] = teamFile.readStringUntil(',');
     teamColors[numTeams] = teamFile.readStringUntil(',');
@@ -77,7 +78,7 @@ void commandHandler()                            // function to handle serial co
     Serial.println(command);
   }
 
-  if(command == "start")                         // start match command resets matchTime variable to 3 before begining the match
+  if(command == "start")                         // start match command resets matchTime variable to 3 minutes before begining the match
   {
     matchStatus = true;
     matchTime = 180;                             // countdown timer length in seconds
@@ -110,11 +111,11 @@ void commandHandler()                            // function to handle serial co
   {
     goalBScored = true;
     command = "none";
-    Serial.println("goal b executed");             // debugging
+    Serial.println("goal b executed");           // debugging
   }
 }
 
-void matchTimer()                                 // function that handles the timekeeping of a match
+void matchTimer()                                // function that handles the timekeeping of a match
 {
   matchMillis = millis();
 
