@@ -44,7 +44,6 @@ int h = 0;
 int s = 0;
 int v = 0;
 int frameRate = 1000;                      // set to 1000 for obvious errors
-String aniString;                          // placeholder during string to char conversion
 
 void setup() 
 {
@@ -54,26 +53,23 @@ void setup()
   if(!SD.begin())
   {
     Serial.println("SD Failed");
+    while(1);
   }
-  else
+
+  teamFile = SD.open("teaminfo.txt", FILE_READ);          // open team info filew
+
+  while(teamFile.available())                       // collect team data from SD card and store in variables
   {
-    teamFile = SD.open("teaminfo.txt", FILE_READ);          // open team info filew
-
-    while(teamFile.available())                     // collect team data from SD card and store in variables
-    {
-      teamNames[numTeams] = teamFile.readStringUntil(',');
-      teamColors[numTeams] = teamFile.readStringUntil(',');
-      teamIDs[numTeams] = teamFile.readStringUntil(',');
-      numTeams++;
-    }
-
-    teamFile.close();                               // close team info file to allow access to other files later
+    teamNames[numTeams] = teamFile.readStringUntil(',');
+    teamColors[numTeams] = teamFile.readStringUntil(',');
+    teamIDs[numTeams] = teamFile.readStringUntil(',');
+    numTeams++;
   }
+
+  teamFile.close();                                 // close team info file to prevent issues downstream
 
   pinMode(IR_SENSOR, INPUT);                        // set pin 2 as an input
 
-
-  
   Serial.print(numTeams);
   Serial.println(" Teams Loaded");
   Serial.println("Initialization Complete");
@@ -218,28 +214,32 @@ void animationHandler()
   }
 }
 
-void sdAnimation()
+void sdAnimation()                                        // handles animations from the SD card
 {
-  aniFile = SD.open("anifile.txt",FILE_READ);
+  String aniString;                                       // placholder during string to integer conversion
 
-  aniString = aniFile.readStringUntil(';');
-  frameRate = aniString.toInt();
+  aniFile = SD.open("anifile.txt",FILE_READ);             // opens specified animation file
+
+  aniString = aniFile.readStringUntil(';');               // loads framerate from file
+  frameRate = 1000 / (aniString.toInt());                 // converts frame rate string to intiger and calculates timing from fram rate
 
   while(aniFile.available())
   {
-    aniString = aniFile.readStringUntil(';');
+    aniString = aniFile.readStringUntil(';');             // loads led number
     numLed = aniString.toInt();
-    aniString = aniFile.readStringUntil(';');
+    aniString = aniFile.readStringUntil(';');             // hue
     h = aniString.toInt();
-    aniString = aniFile.readStringUntil(';');
+    aniString = aniFile.readStringUntil(';');             // saturation
     s = aniString.toInt();
-    aniString = aniFile.readStringUntil(';');
+    aniString = aniFile.readStringUntil(';');             // value
     v = aniString.toInt();
 
     // insert fastLED functions
     
     delay(frameRate);
   }
+
+  aniFile.close();
 }
 
 void loop()                      // main loop for calling other functions
