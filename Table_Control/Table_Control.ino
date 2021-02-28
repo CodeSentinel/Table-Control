@@ -48,11 +48,11 @@ void setup()
     while(1);
   }
 
-  pinMode(IR_SENSOR, INPUT);                    // set pin 2 as an input
+  pinMode(IR_SENSOR, INPUT);                       // set pin 2 as an input
 
-  teamFile = SD.open("teaminfo.txt", FILE_READ);          // open team info file
+  teamFile = SD.open("teaminfo.txt", FILE_READ);          // open team info filew
 
-  while(teamFile.available())                   // collect team data
+  while(teamFile.available())                     // collect team data
   {
     teamNames[numTeams] = teamFile.readStringUntil(',');
     teamColors[numTeams] = teamFile.readStringUntil(',');
@@ -60,14 +60,14 @@ void setup()
     numTeams++;
   }
 
-  teamFile.close();             // close team info file to allow access to other files later
+  teamFile.close();                               // close team info file to allow access to other files later
   
   Serial.print(numTeams);
   Serial.println(" Teams Loaded");
   Serial.println("Initialization Complete");
 }
 
-void commandHandler()                            // function to handle serial command (mainly used for serial line commands during prototyping)
+void commandHandler()                            // function to handle serial commands (mainly used for serial line commands during prototyping)
 {
   if(Serial.available())                         // checks for a command in the serial port and writes it to a string if available
   {
@@ -80,7 +80,7 @@ void commandHandler()                            // function to handle serial co
   if(command == "start")                         // start match command resets matchTime variable to 3 before begining the match
   {
     matchStatus = true;
-    matchTime = 180;                             // countdown timer length
+    matchTime = 180;                             // countdown timer length in seconds
     command = "none";
     Serial.println("start executed");            // debugging
   }
@@ -114,7 +114,7 @@ void commandHandler()                            // function to handle serial co
   }
 }
 
-void matchTimer()                                // function that handles the timekeeping of a match
+void matchTimer()                                 // function that handles the timekeeping of a match
 {
   matchMillis = millis();
 
@@ -152,7 +152,7 @@ void timeDisplay()                                    // function to handle the 
   {
     prevDispMillis = dispMillis;
     
-    Serial.print(matchMin);
+    Serial.print(matchMin);                                     // serial for testing without hardware
     Serial.print(":");
     Serial.print(matchSecTens);
     Serial.println(matchSecOnes);
