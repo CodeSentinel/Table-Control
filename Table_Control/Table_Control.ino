@@ -43,7 +43,7 @@ int numLed = 0;                            // animation variables
 int h = 0;
 int s = 0;
 int v = 0;
-int frameRate = 1000;                      // set to 1000 for obvious errors
+int frameRate;                             // holds frame delay
 
 void setup() 
 {
@@ -178,7 +178,7 @@ void goalDetection()
     goalAScored = false;
     gameFile.print(matchTime);
     gameFile.print(" -- ");
-    gameFile.println("Team A scored");
+    gameFile.println("Team A");
   }
 
   if(goalBScored)
@@ -188,7 +188,7 @@ void goalDetection()
     goalBScored = false;
     gameFile.print(matchTime);
     gameFile.print(" -- ");
-    gameFile.println("Team B Scored");
+    gameFile.println("Team B");
   }
 
   gameFile.close();
@@ -217,24 +217,30 @@ void animationHandler()
 void sdAnimation()                                        // handles animations from the SD card
 {
   String aniString;                                       // placholder during string to integer conversion
+  String frameString;
 
   aniFile = SD.open("anifile.txt",FILE_READ);             // opens specified animation file
 
   aniString = aniFile.readStringUntil(';');               // loads framerate from file
-  frameRate = 1000 / (aniString.toInt());                 // converts frame rate string to intiger and calculates timing from fram rate
+  frameRate = 1000 / (frameString.toInt());               // converts frame rate string to intiger and calculates timing from fram rate
 
   while(aniFile.available())
   {
-    aniString = aniFile.readStringUntil(';');             // loads led number
-    numLed = aniString.toInt();
-    aniString = aniFile.readStringUntil(';');             // hue
-    h = aniString.toInt();
-    aniString = aniFile.readStringUntil(';');             // saturation
-    s = aniString.toInt();
-    aniString = aniFile.readStringUntil(';');             // value
-    v = aniString.toInt();
+    frameString = aniFile.readStringUntil('\n');          // pulls frame from file and stores it to be displayed in next loop
+    
+    while(frameString.available())
+    {
+      aniString = aniFile.readStringUntil(';');           // loads led number
+      numLed = aniString.toInt();
+      aniString = aniFile.readStringUntil(';');           // hue
+      h = aniString.toInt();
+      aniString = aniFile.readStringUntil(';');           // saturation
+      s = aniString.toInt();
+      aniString = aniFile.readStringUntil(';');           // value
+      v = aniString.toInt();
 
-    // insert fastLED functions
+      // insert fastLED functions
+    }
     
     delay(frameRate);
   }
