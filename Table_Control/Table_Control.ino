@@ -56,7 +56,7 @@ void setup()
     while(1);
   }
 
-  teamFile = SD.open("teaminfo.txt", FILE_READ);          // open team info filew
+  teamFile = SD.open("teaminfo.txt", FILE_READ);          // open team info file
 
   while(teamFile.available())                       // collect team data from SD card and store in variables
   {
@@ -228,7 +228,7 @@ void sdAnimation()                                        // handles animations 
   {
     frameString = aniFile.readStringUntil('\n');          // pulls frame from file and stores it to be displayed in next loop
     
-    while(frameString.available())
+    if(strcmp("frame",frameString) != 0)                 
     {
       aniString = aniFile.readStringUntil(';');           // loads led number
       numLed = aniString.toInt();
@@ -239,10 +239,15 @@ void sdAnimation()                                        // handles animations 
       aniString = aniFile.readStringUntil(';');           // value
       v = aniString.toInt();
 
-      // insert fastLED functions
+      leds[numLed] = CHSV(h,s,v);
     }
-    
-    delay(frameRate);
+
+    else
+    {
+      FastLED.show();
+      
+      delay(frameRate);
+    }
   }
 
   aniFile.close();
