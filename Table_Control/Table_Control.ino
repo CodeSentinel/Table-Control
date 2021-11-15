@@ -160,7 +160,7 @@ void timeDisplay()                                    // function to handle the 
   }
 }
 
-void goalDetection()
+void goalTracking()
 {
   gameFile = SD.open("gamelogs.txt", FILE_WRITE);
   
@@ -211,7 +211,7 @@ void loop()                      // main loop for calling other functions
 {
   commandHandler();
 
-  goalDetection();
+  goalTracking();
   
   if(matchStatus)                // timer runs only when the match status is true
   {
