@@ -1,19 +1,4 @@
-#include "libs/FastLED/src/FastLED.h"     // version 3.4.0
-#include <SPI.h>                          // built in no library file necessary
-#include <SD.h>                           // built in no library file necessary
 
-#define REFRESH_INTERVAL 500              // time refresh interval in milliseconds
-#define IR_SENSOR 2                       // connect ir sensor to pin 2
-
-#define MAX_TEAMS 12                      // maximum number of teams allowed in the system   
-
-int numTeams = 0;                         // general team information
-String teamNames[MAX_TEAMS];
-String teamColors[MAX_TEAMS];
-String teamIDs[MAX_TEAMS];
-
-int dispMillis;                           // millis variables for display refresh
-int prevDispMillis = 0;
 /*
  *  MAIN PROGRAM FILE FOR THE INTERACTIVE SOCCER TABLE PROJECT, "TABLE TEAM",
  *  FOR CAL POLY POMONA ROBOTICS CLUB (2021-2022)
@@ -34,6 +19,8 @@ int prevDispMillis = 0;
 // ALL CONSTANTS USED THROUGHOUT THE CODE
 #define REFRESH_INTERVAL 500          // time refresh interval in milliseconds
 #define IR_SENSOR 2                   // connect ir sensor to pin 2
+
+#define MAX_TEAMS 12                  // maximum number of teams (temp)
 
 // ALL VARIABLES NEEDED FOR TIMING USING millis()
 int diffMillis  = 100;         // match timekeeping variables
@@ -68,6 +55,12 @@ File gameFile;                             // stores game statistics
 
 // ALL VARIABLES USED FOR DEBUGGING
 String command;
+
+//  SD DATA MANAGEMENT 
+int numTeams = 0;                         // general team information
+String teamNames[MAX_TEAMS];
+String teamColors[MAX_TEAMS];
+String teamIDs[MAX_TEAMS];
 
 // REQUIRED SETUP FUNCTION FOR THE PROGRAM
 void setup() 
@@ -147,7 +140,7 @@ void commandHandler()                            // function to handle serial co
   }
 }
 
-void matchTimer()                                // function that handles the timekeeping of a match
+void matchTimer()                                           // function that handles the timekeeping of a match
 {
   matchMillis = millis();
 
@@ -156,16 +149,16 @@ void matchTimer()                                // function that handles the ti
     prevMatchMillis = matchMillis - diffMillis;
   }
 
-  diffMillis = matchMillis - prevMatchMillis;          // determines time difference for later referencing during match resume
-  diffMillis = diffMillis + 100;                       // buffer to allow low time differences between loops
+  diffMillis = matchMillis - prevMatchMillis;              // determines time difference for later referencing during match resume
+  diffMillis = diffMillis + 100;                           // buffer to allow low time differences between loops
 
-  if((matchMillis - prevMatchMillis) >= 1000)          // decriments the timer every 1 second
+  if((matchMillis - prevMatchMillis) >= 1000)              // decriments the timer every 1 second
   {
     matchTime = matchTime - 1;
     prevMatchMillis = matchMillis;
   }
 
-  if(matchTime <= 0)         // ends match at 0 second mark
+  if(matchTime <= 0)                                       // ends match at 0 second mark
   {
     matchStatus = false;
     endAni = true;
