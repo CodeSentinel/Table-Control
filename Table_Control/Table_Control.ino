@@ -12,6 +12,8 @@
 
 // ALL LIBRARIES REQUIRED FOR THE PROGRAM
 #include "libs/FastLED/FastLED.h"         // version 3.3.3
+#include <SPI.h>                          // arduino built-in
+#include <SD.h>                           // arduino built-in
 
 // ALL CONSTANTS USED THROUGHOUT THE CODE
 #define REFRESH_INTERVAL 500          // time refresh interval in milliseconds
@@ -36,11 +38,6 @@ int matchMin;
 int matchSec;
 int matchSecTens;
 int matchSecOnes;
-
-// ALL VARIABLES NEEDED FOR DISPLAYING ANIMATIONS
-bool startAni = false;
-bool endAni = false;
-bool goalAni = false;
 
 // ALL VARIABLES USED FOR DEBUGGING
 String command;
@@ -138,7 +135,7 @@ void timeDisplay()          // function to handle the display of the match timer
   }
 }
 
-void goalDetection()
+void goalTracking()
 {
   goalScored = digitalRead(IR_SENSOR) == 1 ? true : false;    // sensor == 1 means object detected (goal), sensor == 0 means no object detected (no goal)
   if(goalScored)                                              // temporary parameter for testing without hardware
@@ -148,27 +145,6 @@ void goalDetection()
     goalScored = false;
   }
 }
-
-void animationHandler()
-{
-  if(startAni)
-  {
-    // insert startup animation
-    startAni = false;
-  }
-
-  if(endAni);
-  {
-    // insert match end animation
-    endAni = false;
-  }
-  if(goalAni)
-  {
-    // insert goal animation
-    goalAni = false;
-  }
-}
-
 
 /*
  * MAIN PROGRAM LOOP FOR THE PROGRAM BELOW. GENERAL CODE SHOULD FLOW AS FOLLOWS:
@@ -191,7 +167,7 @@ void loop()         // main loop for calling other functions
 {
   commandHandler();
 
-  goalDetection();
+  goalTracking();
   
   if(matchStatus)         // timer runs only when the match status is true
   {
@@ -199,6 +175,4 @@ void loop()         // main loop for calling other functions
   }
 
   timeDisplay();
-
-  animationHandler();
 }
