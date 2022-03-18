@@ -20,29 +20,130 @@
 //CREATE THE PRIMARY RFID OBJECT TO INTERACT WITH
 MFRC522 rfid(SS_PIN, RST_PIN);
 
-//CREATE STORAGE FOR THE CARD'S ID NUMBER
+//CREATE STORAGE FOR A CARD'S ID NUMBER
 byte currentID[ID_SIZE];        //for current card's ID
 byte lastID[ID_SIZE];           //the ID of the card last loop
 
+//CREATE CONSTANT STORAGE FOR SPECIFIC TEAM'S CARD NUMBERS
+const byte teamID_1[ID_SIZE] = {57,99,33,179};
+const byte teamID_2[ID_SIZE] = {178,211,255,45};
 
-uint8_t ReadSD_TeamColor(byte teamNum)
+/*
+ * NEW FUNCTIONS DEFINED BELOW
+ */
+
+//NEXT THREE FUNCTIONS FOR SIMULATING CHECKING SD CARD DATA
+//ACCESSES TEAM COLOR, NAME, AND GOAL COUNT USING A TEAM NUMBER
+//THIS TEAM NUMBER IS A BYTE
+String ReadSD_TeamColor(byte teamNum)
 {
-  return 0;
+  //CREATE STORAGE FOR RETURNABLE
+  String colorToReturn = "none";
+
+  //USE TEAM NUMBER TO RETURN TEAM DATA
+  switch(teamNum)
+  {
+    case 1:
+      colorToReturn = "Blue";
+      break;
+    case 2:
+      colorToReturn = "Red";
+      break;
+    default:
+      colorToReturn = "error";
+  }
+
+  //RETURN DATA TO FUNCTION CALL
+  return colorToReturn;
 }
 uint8_t ReadSD_TeamGoals(byte teamNum)
 {
-  return 0;
+  //CREATE STORAGE FOR RETURNABLE
+  byte goalsToReturn = 0;
+ 
+  //USE 
+  switch(teamNum)
+  {
+    case 1:
+      goalsToReturn = 5;
+      break;
+    case 2:
+      goalsToReturn = 10;
+      break;
+    default:
+      goalsToReturn = 255;
+  }
+  return goalsToReturn;
 }
 String ReadSD_TeamName(byte teamNum)
 {
-  return "Null";
+  //CREATE STORAGE FOR RETURNABLE
+  String nameToReturn = "none";
+
+  //USE TEAM NUMBER TO RETURN TEAM DATA
+  switch(teamNum)
+  {
+    case 1:
+      nameToReturn = "Blue Team";
+      break;
+    case 2:
+      nameToReturn = "Red Team";
+      break;
+    default:
+      nameToReturn = "error";
+  }
+
+  //RETURN DATA TO FUNCTION CALL
+  return nameToReturn;
 }
 
+//ENCAPSULATING FUNCTION FOR GETTING A TEAM'S DATA
+//ACCEPTS A RFID CARD'S ID, THEN DETERMINES TEAM NUMBER
+//PRINTS OUT ALL TEAM INFORMATION
 void RetrieveTeamInformation(byte cardID[])
 {
-  
+  byte teamNumber = 0;
+  //BASED OFF THE CARD ID, DETERMINE WHICH TEAM IS TRYING TO PLAY
+  //TEMPORARY SYSTEM TILL TEAM CARD IDs ARE STORED ON THE SD CARD
+  if( (cardID[0] == teamID_1[0]) &&
+      (cardID[1] == teamID_1[1]) &&
+      (cardID[2] == teamID_1[2]) &&
+      (cardID[3] == teamID_1[3])    )
+  {
+    //TEAM THAT SCANNED IN IS TEAM 1
+    teamNumber = 1;
+  }
+  else if(  cardID[0] == teamID_2[0] &&
+            cardID[1] == teamID_2[1] &&
+            cardID[2] == teamID_2[2] &&
+            cardID[3] == teamID_2[3]    )
+  {
+    //TEAM 2 SCANNED IN
+    teamNumber = 2;
+  }
+  else
+  {
+    Serial.println("No recognized team scanned in.");
+  }
+
+  //GET THE TEAM INFORMATION, IF A VALID TEAM SCANNED IN
+  if(teamNumber != 0)
+  {
+    String teamColor = ReadSD_TeamColor(teamNumber);
+    byte teamGoals = ReadSD_TeamGoals(teamNumber);
+    String teamName = ReadSD_TeamName(teamNumber);
+
+    //PRINT OUT THE DATA
+    Serial.print("Team name: ");
+    Serial.print(teamName);
+    Serial.print("  |  Team Color: ");
+    Serial.println(teamColor);
+    Serial.print("Team Goal Count: ");
+    Serial.println(teamGoals);
+  }
 }
 
+//SETUP FUNCTION FOR THE PROGRAM
 void setup() 
 {
   //INITIALIZE SERIAL MONITOR
@@ -55,6 +156,15 @@ void setup()
   rfid.PCD_Init();
 }
 
+/*
+ * MAIN LOOP FOR THE PROGRAM
+ * 
+ * PROGRAM FLOWS AS FOLLOWS:
+ * -CHECK IF CARD IS DETECTED
+ * -CHECK IF CARD IS SAME AS LAST DETECTION
+ * -IF NEW CARD, PRINT OUT A TEAM'S INFORMATION BASED OFF CARD ID
+ * -RESET RFID READER AND PREPARE TO LOOP
+ */
 void loop() 
 {
   //START BY CHECKING IF A NEW RFID CARD IS PRESENT
@@ -101,6 +211,9 @@ void loop()
         {
           lastID[counter] = rfid.uid.uidByte[counter];
         }
+
+        //PRINT OUT THE INFORMATION FOR A VALID TEAM
+        RetrieveTeamInformation(rfid.uid.uidByte);
       }
       else
       {
@@ -111,7 +224,7 @@ void loop()
     {
       Serial.println("An error occured while reading the card.");
     }
-
+    
     //STOP THE SCANNING PROCESS AND REFRESH READER FOR NEXT DETECTION
     rfid.PICC_HaltA();
     rfid.PCD_StopCrypto1();
