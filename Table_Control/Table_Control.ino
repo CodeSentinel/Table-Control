@@ -17,7 +17,7 @@
 
 // ALL CONSTANTS USED THROUGHOUT THE CODE
 #define MATCH_LENGTH 180                    // time of one match
-#define REFRESH_INTERVAL 500              // time refresh interval in milliseconds
+#define REFRESH_INTERVAL 100              // time refresh interval in milliseconds
 #define LEFT_BUTTON 3
 #define RIGHT_BUTTON 4
 #define PLAY_PAUSE 5
@@ -53,8 +53,8 @@ String command;
 void setup() 
 {
   Serial.begin(9600);
-  Serial.println("System Start");
-  pinMode(LEFT_BUTTON, INPUT);                // set pins as input
+  //Serial.println("System Start");
+  pinMode(LEFT_BUTTON, INPUT);               // set pins as input
   pinMode(RIGHT_BUTTON, INPUT);
   pinMode(PLAY_PAUSE, INPUT);
   pinMode(START_MATCH, INPUT);
@@ -66,15 +66,14 @@ void commandHandler()                       // function to handle serial command
   {
     delay(2);                               // allows string to fully enter buffer for reading
     command = Serial.readString();
-    Serial.print("Recieved Command: ");
-    Serial.println(command);
-    Serial.println(command);
+    //Serial.print("Recieved Command: ");
+    //Serial.println(command);
   }
 
   if(command == "start")                    // start match command resets matchTime variable to 3 before begining the match
   {
     matchStatus = true;
-    matchTime = MATCH_LENGTH;                        // countdown timer length
+    matchTime = MATCH_LENGTH;               // countdown timer length
     command = "none";
     Serial.println("start executed");       // debugging
   }
