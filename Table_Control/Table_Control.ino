@@ -24,7 +24,7 @@ int diffMillis  = 100;                            // match timekeeping variables
 int matchMillis;
 int prevMatchMillis = 0;
 const unsigned int scoreboardMillisDelay = 500;   // delay between scoreboard refreshes
-unsigned int prevScoreboardMillis = 0             // storage for last time scoreboard refreshed
+unsigned int prevScoreboardMillis = 0;             // storage for last time scoreboard refreshed
 
 // ALL VARIABLES NEEDED FOR GAME MECHANICS AND TIMING
 int matchTime;                                        // match time in seconds
@@ -38,6 +38,8 @@ int matchMin;
 int matchSec;
 int matchSecTens;
 int matchSecOnes;
+int dispMillis;
+int prevDispMillis;
 
 // ALL VARIABLES USED FOR DEBUGGING
 String command;
@@ -111,7 +113,6 @@ void matchTimer()                        // funtion that handles the timekeeping
   if(matchTime <= 0)                     // ends match at 0 second mark
   {
     matchStatus = false;
-    endAni = true;
   }
 }
 
@@ -141,7 +142,6 @@ void goalTracking()
   if(goalScored)                                              // temporary parameter for testing without hardware
   {
     matchStatus = false;
-    goalAni = true;
     goalScored = false;
   }
 }
