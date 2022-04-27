@@ -278,7 +278,7 @@ namespace TableGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2564, 1404);
+            this.ClientSize = new System.Drawing.Size(2560, 1400);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -287,6 +287,7 @@ namespace TableGUI
             this.Controls.Add(this.lbl_Rscore);
             this.Controls.Add(this.lbl_Lscore);
             this.Controls.Add(this.lbl_Timer);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form1";
             this.Text = "TableUI";
