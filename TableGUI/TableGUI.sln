@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32228.343
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TableGUI", "TableGUI.csproj", "{59C5EB8F-0EE4-4AEB-BA9D-3836C79D8109}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59C5EB8F-0EE4-4AEB-BA9D-3836C79D8109}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59C5EB8F-0EE4-4AEB-BA9D-3836C79D8109}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59C5EB8F-0EE4-4AEB-BA9D-3836C79D8109}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59C5EB8F-0EE4-4AEB-BA9D-3836C79D8109}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {60CE7BCB-B6D9-46F3-92B0-764E86F5F116}
+	EndGlobalSection
+EndGlobal
