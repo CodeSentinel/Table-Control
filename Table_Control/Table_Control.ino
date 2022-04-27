@@ -17,8 +17,12 @@
 #include <SD.h>                           // arduino built-in
 
 // ALL CONSTANTS USED THROUGHOUT THE CODE
-#define REFRESH_INTERVAL 500              // time refresh interval in milliseconds
-#define IR_SENSOR 2                       // connect ir sensor to pin 2
+#define MATCH_LENGTH 180                    // time of one match
+#define REFRESH_INTERVAL 100              // time refresh interval in milliseconds
+#define LEFT_BUTTON 3
+#define RIGHT_BUTTON 6
+#define PLAY_PAUSE 5
+#define START_MATCH 4
 
 #define MAX_TEAMS 12                  // maximum number of teams (temp)
 
@@ -27,20 +31,29 @@ int diffMillis  = 100;                            // match timekeeping variables
 int matchMillis;
 int prevMatchMillis = 0;
 const unsigned int scoreboardMillisDelay = 500;   // delay between scoreboard refreshes
-unsigned int prevScoreboardMillis = 0             // storage for last time scoreboard refreshed
+unsigned int prevScoreboardMillis = 0;             // storage for last time scoreboard refreshed
+const unsigned int ioMillisDelay = 50;            //delay between IO checks
+unsigned int prevIoMillis = 0;                    //storage for last time IO was checked
 
 // ALL VARIABLES NEEDED FOR GAME MECHANICS AND TIMING
-int matchTime;                                        // match time in seconds
+int matchTime = 0;                                    // match time in seconds
 byte scoreTeam1 = 0;                                  // score counter for team 1
 byte scoreTeam2 = 0;                                  // score counter for team 2
 bool matchStatus = false;                             // flag for if a game is active
 bool goalScored = false;                              // flag for if a goal has been scored
+String dataOut;                                       // outputs to serial for computer interface
+bool btnLeftGoalPressed = false;                      //flags for all the pressable buttons
+bool btnRightGoalPressed = false;
+bool btnStartGamePressed = false;
+bool btnPauseGamePressed = false;
 
 // ALL VARIABLES NEEDED FOR TIME AND GOAL DISPLAY SYSTEM
-int matchMin;
-int matchSec;
-int matchSecTens;
-int matchSecOnes;
+int matchMin = 0;
+int matchSec = 0;
+int matchSecTens = 0;
+int matchSecOnes = 0;
+int dispMillis;
+int prevDispMillis;
 
 bool goalAScored = false;                  // code test parameters
 bool goalBScored = false;
@@ -91,6 +104,11 @@ void setup()
   Serial.print(numTeams);
   Serial.println(" Teams Loaded");
   Serial.println("Initialization Complete");
+  //Serial.println("System Start");
+  pinMode(LEFT_BUTTON, INPUT_PULLUP);               // set pins as input
+  pinMode(RIGHT_BUTTON, INPUT_PULLUP);
+  pinMode(PLAY_PAUSE, INPUT_PULLUP);
+  pinMode(START_MATCH, INPUT_PULLUP);
 }
 
 void commandHandler()                       // function to handle serial command (mainly used for serial line commands during prototyping)
@@ -99,14 +117,14 @@ void commandHandler()                       // function to handle serial command
   {
     delay(2);                               // allows string to fully enter buffer for reading
     command = Serial.readString();
-    Serial.print("Recieved Command: ");
-    Serial.println(command);
+    //Serial.print("Recieved Command: ");
+    //Serial.println(command);
   }
 
   if(command == "start")                    // start match command resets matchTime variable to 3 before begining the match
   {
     matchStatus = true;
-    matchTime = 180;                        // countdown timer length
+    matchTime = MATCH_LENGTH;               // countdown timer length
     command = "none";
     Serial.println("start executed");       // debugging
   }
@@ -138,6 +156,16 @@ void commandHandler()                       // function to handle serial command
     command = "none";
     Serial.println("goal b executed");           // debugging
   }
+
+  if(command == "k")
+  {
+    matchStatus = false;
+    matchTime = 0;
+    scoreTeam1 = 0;
+    scoreTeam2 = 0;
+    command = "none";
+    //Serial.println("kill executed");    // debugging
+  }
 }
 
 void matchTimer()                                           // function that handles the timekeeping of a match
@@ -150,12 +178,6 @@ void matchTimer()                                           // function that han
   }
 
     prevMatchMillis = matchMillis;
-  }
-
-  if(matchTime <= 0)                     // ends match at 0 second mark
-  {
-    matchStatus = false;
-    endAni = true;
   }
 }
 
@@ -172,35 +194,132 @@ void timeDisplay()                       // function to handle the display of th
   {
     prevDispMillis = dispMillis;
     
-    Serial.print(matchMin);                                     // serial for testing without hardware
+    /* Serial.print(matchMin);
     Serial.print(":");
     Serial.print(matchSecTens);
-    Serial.println(matchSecOnes);
+    Serial.println(matchSecOnes); */
+
+    dataOut = "T";
+    dataOut = dataOut + matchMin;
+    dataOut = dataOut + ":";
+    dataOut = dataOut + matchSecTens;
+    dataOut = dataOut + matchSecOnes;
+    dataOut = dataOut + "L";
+    dataOut = dataOut + scoreTeam1;
+    dataOut = dataOut + "R";
+    dataOut = dataOut + scoreTeam2;
+    Serial.print(dataOut);
+
+    if(matchTime <= 0)                   // ends match at 0 seconds after displaying the final time
+    {
+      matchStatus = false;
+    }
   }
 }
 
-void goalTracking()
+void gameInput()
 {
   gameFile = SD.open("gamelogs.txt", FILE_WRITE);
   
-  if(goalAScored)                                    // temporary parameter for testing without hardware
+  if(btnLeftGoalPressed)
   {
+    btnLeftGoalPressed = false;
     matchStatus = false;
-    goalAni = true;
-    goalAScored = false;
-    gameFile.print(matchTime);
-    gameFile.print(" -- ");
-    gameFile.println("Team A");
+    scoreTeam1 = scoreTeam1 + 1;
   }
 
-  if(goalBScored)
+  if(btnRightGoalPressed)
   {
+    btnRightGoalPressed = false;
     matchStatus = false;
-    goalAni = true;
-    goalBScored = false;
-    gameFile.print(matchTime);
-    gameFile.print(" -- ");
-    gameFile.println("Team B");
+    scoreTeam2 = scoreTeam2 + 1;
+  }
+
+  if(btnPauseGamePressed)
+  {
+    btnPauseGamePressed = false;
+    if(matchStatus)
+    {
+      matchStatus = false;
+    }
+    else
+    {
+      matchStatus = true;
+    }
+  }
+
+  if(btnStartGamePressed)
+  {
+    btnStartGamePressed = false;
+    if(matchStatus = false)
+    {
+      matchTime = MATCH_LENGTH;
+      scoreTeam1 = 0;
+      scoreTeam2 = 0;
+    }
+  }
+}
+
+void CheckButtonStatus()
+{
+  /*
+   * To check for changes to a push button, while also debouncing the signal, we need to
+   * check the current state of the button, as well as the last state of the button. If
+   * the current button state is different from the previous, then the button has either
+   * been pressed or released. To prevent button bounce, the function should also only
+   * occur once every 20-30ms or so. The flag for buttons is cleared when a button is
+   * released, or can be cleared by a function that uses the button (to prevent multiple
+   * functions that use the same button from occuring)
+  */
+  //CHECK FOR TIMING
+  unsigned int currentTime = millis();
+  if((currentTime - prevIoMillis) >= ioMillisDelay)
+  {
+    //READ ALL BUTTON STATES
+    bool leftGoalState = digitalRead(btnLeftGoal);
+    bool rightGoalState = digitalRead(btnRightGoal);
+    bool pauseGameState = digitalRead(btnPauseGame);
+    bool startGameState = digitalRead(btnStartGame);
+  
+    //CHECK FOR CHANGE TO FIRST BUTTON
+    if(leftGoalState == LOW && btnLeftGoalPressed == false)
+    {
+      //BUTTON HAS BEEN PRESSED
+      btnLeftGoalPressed = true;
+    }
+    else if(leftGoalState == HIGH && btnLeftGoalPressed == true)
+    {
+      //BUTTON HAS BEEN RELEASED
+      btnLeftGoalPressed = false;
+    }
+    else
+    {
+      //BUTTON IS BEING HELD DOWN OR HASN'T BEEN TOUCHED
+      //DO NOTHING
+    }
+  
+    //CHECK FOR SECOND BUTTON CHANGE
+    if(rightGoalState == LOW && btnRightGoalPressed == false)
+      btnRightGoalPressed = true;
+    else if(rightGoalState == HIGH && btnRightGoalPressed == true)
+      btnRightGoalPressed = false;
+    else{}
+  
+    //CHECK FOR THIRD BUTTON CHANGE
+    if(pauseGameState == LOW && btnPauseGamePressed == false)
+      btnPauseGamePressed = true;
+    else if(pauseGameState == HIGH && btnPauseGamePressed == true)
+      btnPauseGamePressed = false;
+    else{}
+  
+    //CHECK FOR FOURTH BUTTON CHANGE
+    if(startGameState == LOW && btnStartGamePressed == false)
+      btnStartGamePressed = true;
+    else if(startGameState == HIGH && btnStartGamePressed == true)
+      btnStartGamePressed = false;
+    else{}
+
+    prevIoMillis = currentTime;
   }
 
   gameFile.close();
@@ -223,16 +342,18 @@ void goalTracking()
  * ----play any animations that correspond with end of match
  * ----prepare RFID scanner for next check-in
  */
+
 void loop()                 // main loop for calling other functions
 {
   commandHandler();
-
-  goalTracking();
+  
+  CheckButtonStatus();
+  
+  gameInput();
   
   if(matchStatus)          // timer runs only when the match status is true
   {
     matchTimer();
+    timeDisplay();
   }
-
-  timeDisplay();
 }
