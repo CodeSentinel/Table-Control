@@ -1,0 +1,9 @@
+C:\Users\benjhong\source\repos\TableGUI\bin\Release\TableGUI.exe.config
+C:\Users\benjhong\source\repos\TableGUI\bin\Release\TableGUI.exe
+C:\Users\benjhong\source\repos\TableGUI\bin\Release\TableGUI.pdb
+C:\Users\benjhong\source\repos\TableGUI\obj\Release\TableGUI.Form1.resources
+C:\Users\benjhong\source\repos\TableGUI\obj\Release\TableGUI.Properties.Resources.resources
+C:\Users\benjhong\source\repos\TableGUI\obj\Release\TableGUI.csproj.GenerateResource.cache
+C:\Users\benjhong\source\repos\TableGUI\obj\Release\TableGUI.csproj.CoreCompileInputs.cache
+C:\Users\benjhong\source\repos\TableGUI\obj\Release\TableGUI.exe
+C:\Users\benjhong\source\repos\TableGUI\obj\Release\TableGUI.pdb
