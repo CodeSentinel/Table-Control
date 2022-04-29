@@ -18,10 +18,10 @@
 // ALL CONSTANTS USED THROUGHOUT THE CODE
 #define MATCH_LENGTH 180                    // time of one match
 #define REFRESH_INTERVAL 100              // time refresh interval in milliseconds
-#define LEFT_BUTTON 3
-#define RIGHT_BUTTON 6
-#define PLAY_PAUSE 5
-#define START_MATCH 4
+#define LEFT_BUTTON 4
+#define RIGHT_BUTTON 7
+#define PLAY_PAUSE 6
+#define START_MATCH 5
 
 // ALL VARIABLES NEEDED FOR TIMING USING millis()
 int diffMillis  = 100;                            // match timekeeping variables
@@ -39,6 +39,10 @@ byte scoreTeam2 = 0;                                  // score counter for team 
 bool matchStatus = false;                             // flag for if a game is active
 bool goalScored = false;                              // flag for if a goal has been scored
 String dataOut;                                       // outputs to serial for computer interface
+bool btnLlast = HIGH;
+bool btnRlast = HIGH;
+bool btnSlast = HIGH;
+bool btnPlast = HIGH;
 bool btnLeftGoalPressed = false;                      //flags for all the pressable buttons
 bool btnRightGoalPressed = false;
 bool btnStartGamePressed = false;
@@ -176,14 +180,14 @@ void gameInput()
   if(btnLeftGoalPressed)
   {
     btnLeftGoalPressed = false;
-    matchStatus = false;
+    //matchStatus = false;
     scoreTeam1 = scoreTeam1 + 1;
   }
 
   if(btnRightGoalPressed)
   {
     btnRightGoalPressed = false;
-    matchStatus = false;
+    //matchStatus = false;
     scoreTeam2 = scoreTeam2 + 1;
   }
 
@@ -228,20 +232,22 @@ void CheckButtonStatus()
   if((currentTime - prevIoMillis) >= ioMillisDelay)
   {
     //READ ALL BUTTON STATES
-    bool leftGoalState = digitalRead(btnLeftGoal);
-    bool rightGoalState = digitalRead(btnRightGoal);
-    bool pauseGameState = digitalRead(btnPauseGame);
-    bool startGameState = digitalRead(btnStartGame);
+    bool leftGoalState = digitalRead(LEFT_BUTTON);
+    bool rightGoalState = digitalRead(RIGHT_BUTTON);
+    bool pauseGameState = digitalRead(PLAY_PAUSE);
+    bool startGameState = digitalRead(START_MATCH);
   
     //CHECK FOR CHANGE TO FIRST BUTTON
-    if(leftGoalState == LOW && btnLeftGoalPressed == false)
+    if(leftGoalState == LOW && btnLlast == HIGH)
     {
       //BUTTON HAS BEEN PRESSED
+      btnLlast = LOW;
       btnLeftGoalPressed = true;
     }
-    else if(leftGoalState == HIGH && btnLeftGoalPressed == true)
+    else if(leftGoalState == HIGH && btnLlast == LOW)
     {
       //BUTTON HAS BEEN RELEASED
+      btnLlast = HIGH;
       btnLeftGoalPressed = false;
     }
     else
@@ -272,6 +278,8 @@ void CheckButtonStatus()
     else{}
 
     prevIoMillis = currentTime;
+
+    gameInput();
   }
 }
 
@@ -298,8 +306,6 @@ void loop()                 // main loop for calling other functions
   commandHandler();
   
   CheckButtonStatus();
-  
-  gameInput();
   
   if(matchStatus)          // timer runs only when the match status is true
   {
