@@ -63,11 +63,11 @@ String command;
 void setup() 
 {
   Serial.begin(9600);
-  //Serial.println("System Start");
   pinMode(LEFT_BUTTON, INPUT_PULLUP);               // set pins as input
   pinMode(RIGHT_BUTTON, INPUT_PULLUP);
   pinMode(PLAY_PAUSE, INPUT_PULLUP);
   pinMode(START_MATCH, INPUT_PULLUP);
+  Serial.println("System initialized");
 }
 
 void commandHandler()                       // function to handle serial command (mainly used for serial line commands during prototyping)
@@ -139,35 +139,35 @@ void matchTimer()                        // funtion that handles the timekeeping
   }
 }
 
-void timeDisplay()                       // function to handle the display of the match timer
+void dataOutput()
 {
   matchMin = matchTime / 60;
   matchSec = matchTime % 60;
   matchSecTens = matchSec / 10;
   matchSecOnes = matchSec % 10;
-    
+  
+  dataOut = "T";
+  dataOut = dataOut + matchMin;
+  dataOut = dataOut + ":";
+  dataOut = dataOut + matchSecTens;
+  dataOut = dataOut + matchSecOnes;
+  dataOut = dataOut + "L";
+  dataOut = dataOut + scoreTeam1;
+  dataOut = dataOut + "R";
+  dataOut = dataOut + scoreTeam2;
+  Serial.print(dataOut);
+}
+
+void timeDisplay()                       // function to handle the display of the match timer
+{    
   dispMillis = millis();
   
   if((dispMillis - prevDispMillis) >= REFRESH_INTERVAL)         // checks to see if the display needs to be refreshed
   {
     prevDispMillis = dispMillis;
+
+    dataOutput();
     
-    /* Serial.print(matchMin);
-    Serial.print(":");
-    Serial.print(matchSecTens);
-    Serial.println(matchSecOnes); */
-
-    dataOut = "T";
-    dataOut = dataOut + matchMin;
-    dataOut = dataOut + ":";
-    dataOut = dataOut + matchSecTens;
-    dataOut = dataOut + matchSecOnes;
-    dataOut = dataOut + "L";
-    dataOut = dataOut + scoreTeam1;
-    dataOut = dataOut + "R";
-    dataOut = dataOut + scoreTeam2;
-    Serial.print(dataOut);
-
     if(matchTime <= 0)                   // ends match at 0 seconds after displaying the final time
     {
       matchStatus = false;
@@ -182,6 +182,7 @@ void gameInput()
     btnLeftGoalPressed = false;
     //matchStatus = false;
     scoreTeam1 = scoreTeam1 + 1;
+    dataOutput();
   }
 
   if(btnRightGoalPressed)
@@ -189,6 +190,7 @@ void gameInput()
     btnRightGoalPressed = false;
     //matchStatus = false;
     scoreTeam2 = scoreTeam2 + 1;
+    dataOutput();
   }
 
   if(btnPauseGamePressed)
