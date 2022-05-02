@@ -11,13 +11,13 @@
  */
 
 // ALL LIBRARIES REQUIRED FOR THE PROGRAM
-#include "libs/FastLED/FastLED.h"         // version 3.3.3
+//#include "libs/FastLED/FastLED.h"         // version 3.3.3
 #include <SPI.h>                          // arduino built-in
 #include <SD.h>                           // arduino built-in
 
 // ALL CONSTANTS USED THROUGHOUT THE CODE
 #define MATCH_LENGTH 180                    // time of one match
-#define REFRESH_INTERVAL 100              // time refresh interval in milliseconds
+#define REFRESH_INTERVAL 200              // time refresh interval in milliseconds
 #define LEFT_BUTTON 4
 #define RIGHT_BUTTON 7
 #define PLAY_PAUSE 6
@@ -180,7 +180,7 @@ void gameInput()
   if(btnLeftGoalPressed)
   {
     btnLeftGoalPressed = false;
-    //matchStatus = false;
+    matchStatus = false;
     scoreTeam1 = scoreTeam1 + 1;
     dataOutput();
   }
@@ -188,7 +188,7 @@ void gameInput()
   if(btnRightGoalPressed)
   {
     btnRightGoalPressed = false;
-    //matchStatus = false;
+    matchStatus = false;
     scoreTeam2 = scoreTeam2 + 1;
     dataOutput();
   }
@@ -209,11 +209,12 @@ void gameInput()
   if(btnStartGamePressed)
   {
     btnStartGamePressed = false;
-    if(matchStatus = false)
+    if(true)
     {
       matchTime = MATCH_LENGTH;
       scoreTeam1 = 0;
       scoreTeam2 = 0;
+      matchStatus = true;
     }
   }
 }
@@ -259,24 +260,42 @@ void CheckButtonStatus()
     }
   
     //CHECK FOR SECOND BUTTON CHANGE
-    if(rightGoalState == LOW && btnRightGoalPressed == false)
+    if(rightGoalState == LOW && btnRlast == HIGH)
+    {
+      btnRlast = LOW;
       btnRightGoalPressed = true;
-    else if(rightGoalState == HIGH && btnRightGoalPressed == true)
+    }
+    else if(rightGoalState == HIGH && btnRlast == LOW)
+    {
+      btnRlast = HIGH;
       btnRightGoalPressed = false;
+    }
     else{}
   
     //CHECK FOR THIRD BUTTON CHANGE
-    if(pauseGameState == LOW && btnPauseGamePressed == false)
+    if(pauseGameState == LOW && btnPlast == HIGH)
+    {
+      btnPlast = LOW;
       btnPauseGamePressed = true;
-    else if(pauseGameState == HIGH && btnPauseGamePressed == true)
+    }
+    else if(pauseGameState == HIGH && btnPlast == LOW)
+    {
+      btnPlast = HIGH;
       btnPauseGamePressed = false;
+    }
     else{}
   
     //CHECK FOR FOURTH BUTTON CHANGE
-    if(startGameState == LOW && btnStartGamePressed == false)
+    if(startGameState == LOW && btnSlast == HIGH)
+    {
+      btnSlast = LOW;
       btnStartGamePressed = true;
-    else if(startGameState == HIGH && btnStartGamePressed == true)
+    }
+    else if(startGameState == HIGH && btnSlast == LOW)
+    {
+      btnSlast = HIGH;
       btnStartGamePressed = false;
+    }
     else{}
 
     prevIoMillis = currentTime;
